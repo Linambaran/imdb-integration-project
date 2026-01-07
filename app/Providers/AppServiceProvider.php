@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Request;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,8 +22,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if (config('app.env') !== 'local' || env('APP_URL') !== 'http://localhost') {
+        $host = Request::getHost();
+        
+        if (str_contains($host, '.trycloudflare.com')) {
+            // 1. Paksa HTTPS
             URL::forceScheme('https');
-        }
-    }    
+
+            // 2. Paksa APP_URL agar sesuai dengan domain acak Cloudflare saat ini
+            // Jadi aset gambar/CSS akan mengikuti domain baru secara otomatis
+            Config::set('app.url', 'https://' . $host);
+        }    
+    }
 }

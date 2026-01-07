@@ -1,130 +1,192 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-cyan-400 leading-tight flex items-center gap-2">
-            Marketing Command Center
-        </h2>
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-4 w-full md:w-auto">
+                <a href="{{ url('/') }}" class="group flex items-center gap-2 text-gray-500 hover:text-white transition duration-200">
+                    <div class="p-1 rounded-full group-hover:bg-gray-800">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                    </div>
+                    <span class="text-sm font-medium hidden sm:block">Back to Home</span>
+                </a>
+                <div class="h-6 w-px bg-gray-700 hidden sm:block"></div>
+                <h2 class="font-semibold text-xl text-cyan-400 leading-tight">
+                    Marketing Command Center
+                </h2>
+            </div>
+        </div>
     </x-slot>
 
-    <div class="py-12 bg-gray-900 min-h-screen">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
 
-                <div class="bg-gray-800 border border-gray-700 shadow-lg rounded-xl overflow-hidden">
+            <div class="flex justify-between items-end border-b border-gray-700 pb-4">
+                <div>
+                    <h3 class="text-2xl font-bold text-white">
+                        @if(request('search'))
+                            Search Results for "<span class="text-yellow-500">{{ request('search') }}</span>"
+                        @else
+                            Performance Overview
+                        @endif
+                    </h3>
+                    <p class="text-gray-400 text-sm mt-1">Real-time market insights and campaign tracking.</p>
+                </div>
+                
+                <form action="{{ url()->current() }}" method="GET" class="flex gap-2">
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            name="search" 
+                            value="{{ request('search') }}"
+                            placeholder="Search movie/show..." 
+                            class="bg-gray-900 text-white border border-gray-700 rounded-lg pl-10 pr-4 py-2 focus:ring-2 focus:ring-cyan-500 outline-none w-64 text-sm"
+                        >
+                        <svg class="w-4 h-4 text-gray-500 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                    <button type="submit" class="bg-yellow-500 hover:bg-yellow-400 text-black font-bold px-4 py-2 rounded-lg transition text-sm">
+                        Search
+                    </button>
+                    @if(request('search'))
+                        <a href="{{ url()->current() }}" class="bg-gray-700 text-white px-3 py-2 rounded-lg hover:bg-gray-600 text-sm">Clear</a>
+                    @endif
+                </form>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <div class="bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border border-gray-700">
                     <div class="p-6 border-b border-gray-700 flex justify-between items-center">
-                        <h3 class="font-bold text-cyan-400 flex items-center gap-2">
-                            Trending Now
-                        </h3>
-                        <span class="text-xs text-gray-500">Top Votes</span>
+                        <h4 class="text-lg font-bold text-cyan-400">Trending Now</h4>
+                        <span class="text-xs bg-gray-700 text-white px-2 py-1 rounded">Top Vote Counts</span>
                     </div>
-                    <table class="w-full text-sm text-gray-300">
-                        <tbody class="divide-y divide-gray-700">
-                            @forelse($trending as $row)
-                            <tr class="hover:bg-gray-700/50 transition group">
-                                <td class="p-4">
-                                    <div class="font-bold text-white group-hover:text-cyan-300 transition">{{ $row->show_name }}</div>
-                                    <div class="text-xs text-gray-500 mt-1 flex gap-2">
-                                        <span class="bg-gray-700 px-1.5 rounded">{{ $row->network_name ?? 'N/A' }}</span>
-                                        <span>{{ $row->genre_name }}</span>
-                                    </div>
-                                </td>
-                                <td class="p-4 text-right">
-                                    <div class="flex items-center justify-end gap-1 text-yellow-400 font-bold">
-                                        <span>★</span> {{ number_format($row->rating, 1) }}
-                                    </div>
-                                    <div class="text-xs text-gray-500 mt-1">{{ number_format($row->vote_count) }} votes</div>
-                                </td>
-                            </tr>
-                            @empty
-                            <tr><td class="p-4 text-center text-gray-500">No Data</td></tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="bg-gray-800 border border-gray-700 shadow-lg rounded-xl overflow-hidden">
-                    <div class="p-5 border-b border-gray-700 flex justify-between items-center">
-                        <h3 class="font-bold text-rose-400 flex items-center gap-2">
-                            Campaign Priority
-                        </h3>
-                        <span class="text-xs bg-rose-500/10 text-rose-400 px-2 py-1 rounded border border-rose-500/20">Action Required</span>
-                    </div>
-                    <div class="p-5 space-y-4">
-                        @forelse($priority as $row)
-                        <div class="flex flex-col bg-gray-900/50 p-3 rounded-lg border-l-4 {{ $row->campaign_priority == 'Premium Priority' ? 'border-rose-500' : 'border-amber-500' }}">
-                            <div class="flex justify-between items-start">
-                                <span class="font-bold text-gray-200">{{ $row->show_name }}</span>
-                                <span class="text-[10px] uppercase tracking-wider font-bold {{ $row->campaign_priority == 'Premium Priority' ? 'text-rose-400' : 'text-amber-400' }}">
-                                    {{ $row->campaign_priority }}
-                                </span>
-                            </div>
-                            <div class="mt-2 text-xs text-gray-400">
-                                <span class="text-gray-500">Strategy:</span> 
-                                <span class="text-gray-300 italic">{{ $row->recommended_strategy ?? 'General Promotion' }}</span>
-                            </div>
-                        </div>
-                        @empty
-                        <div class="text-gray-500 text-center">No Priority Campaigns</div>
-                        @endforelse
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-gray-300">
+                            <thead class="bg-gray-900 text-gray-400 uppercase text-xs">
+                                <tr>
+                                    <th class="px-4 py-3">Title</th>
+                                    <th class="px-4 py-3 text-center">Votes</th>
+                                    <th class="px-4 py-3 text-center">Rating</th>
+                                    <th class="px-4 py-3 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-700">
+                                @forelse($trending as $item)
+                                <tr class="hover:bg-gray-700/50 transition">
+                                    <td class="px-4 py-3 font-medium text-white truncate max-w-[150px]" title="{{ $item->show_name }}">
+                                        {{ $item->show_name }}
+                                        <div class="text-xs text-gray-500">{{ $item->genre_name }}</div>
+                                    </td>
+                                    <td class="px-4 py-3 text-center">{{ number_format($item->vote_count) }}</td>
+                                    <td class="px-4 py-3 text-center text-yellow-500 font-bold">{{ number_format($item->rating, 1) }}</td>
+                                    <td class="px-4 py-3 text-right">
+                                        <a href="#" class="text-cyan-400 hover:text-cyan-300">Analyze</a>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="4" class="px-4 py-4 text-center text-gray-500">No trending data found.</td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
-                <div class="bg-gray-800 border border-gray-700 shadow-lg rounded-xl overflow-hidden">
-                    <div class="p-5 border-b border-gray-700">
-                        <h3 class="font-bold text-emerald-400 flex items-center gap-2">
-                            Content Quality Tiers
-                        </h3>
+                <div class="bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border border-gray-700">
+                    <div class="p-6 border-b border-gray-700 flex justify-between items-center">
+                        <h4 class="text-lg font-bold text-purple-400">Content Tiers</h4>
+                        <span class="text-xs bg-gray-700 text-white px-2 py-1 rounded">Quality Matrix</span>
                     </div>
-                    <div class="p-5 grid grid-cols-1 gap-3">
-                        @forelse($tier as $row)
-                        <div class="flex items-center justify-between p-2 rounded hover:bg-gray-700/30 transition">
-                            <span class="text-gray-300">{{ $row->show_name }}</span>
-                            <div class="flex items-center gap-2">
-                                @if($row->quality_category == 'Good Quality')
-                                    <span class="px-2 py-0.5 bg-emerald-500/20 text-emerald-400 text-xs rounded border border-emerald-500/30">Good</span>
-                                @else
-                                    <span class="px-2 py-0.5 bg-gray-600/20 text-gray-400 text-xs rounded border border-gray-600/30">Avg</span>
-                                @endif
-                                
-                                <span class="text-xs font-mono text-gray-500">{{ $row->content_tier }}</span>
-                            </div>
-                        </div>
-                        @empty
-                        <div class="text-gray-500 text-center">No Data</div>
-                        @endforelse
-                    </div>
-                </div>
-
-                <div class="bg-gray-800 border border-gray-700 shadow-lg rounded-xl overflow-hidden">
-                    <div class="p-5 border-b border-gray-700">
-                        <h3 class="font-bold text-violet-400 flex items-center gap-2">
-                            Genre Market Insights
-                        </h3>
-                    </div>
-                    <div class="p-5 flex flex-wrap gap-3">
-                        @forelse($insights as $row)
-                        <div class="relative group cursor-help p-3 rounded-lg border bg-gray-700/20 
-                            {{ $row->market_status == 'Niche Genre' ? 'border-violet-500/30' : 'border-blue-500/30' }}">
-                            
-                            <div class="flex justify-between items-center gap-4">
-                                <span class="font-bold text-gray-200">{{ $row->genre_name }}</span>
-                                <span class="text-[10px] px-1.5 py-0.5 rounded uppercase 
-                                    {{ $row->market_status == 'Niche Genre' ? 'bg-violet-500 text-white' : 'bg-blue-500 text-white' }}">
-                                    {{ $row->market_status == 'Niche Genre' ? 'Niche' : 'Grow' }}
-                                </span>
-                            </div>
-                            
-                            <div class="text-xs text-gray-400 mt-2 opacity-70 group-hover:opacity-100 transition">
-                                {{ Str::limit($row->targeting_recommendation, 25) }}
-                            </div>
-                        </div>
-                        @empty
-                        <div class="text-gray-500 text-center w-full">No Insights</div>
-                        @endforelse
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-gray-300">
+                            <thead class="bg-gray-900 text-gray-400 uppercase text-xs">
+                                <tr>
+                                    <th class="px-4 py-3">Title</th>
+                                    <th class="px-4 py-3">Tier</th>
+                                    <th class="px-4 py-3 text-center">Quality</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-700">
+                                @forelse($tier as $item)
+                                <tr class="hover:bg-gray-700/50 transition">
+                                    <td class="px-4 py-3 font-medium text-white truncate max-w-[150px]">{{ $item->show_name }}</td>
+                                    <td class="px-4 py-3">
+                                        <span class="px-2 py-1 rounded text-xs font-bold 
+                                            {{ $item->content_tier == 'S-Tier' ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/50' : 
+                                              ($item->content_tier == 'A-Tier' ? 'bg-green-500/20 text-green-500 border border-green-500/50' : 'bg-gray-700 text-gray-300') }}">
+                                            {{ $item->content_tier }}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-3 text-center">{{ $item->quality_category }}</td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="3" class="px-4 py-4 text-center text-gray-500">No data available.</td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
             </div>
+
+            <div class="bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border border-gray-700">
+                <div class="p-6 border-b border-gray-700">
+                    <h4 class="text-lg font-bold text-red-400">High Priority Campaigns</h4>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-gray-300">
+                        <thead class="bg-gray-900 text-gray-400 uppercase text-xs">
+                            <tr>
+                                <th class="px-6 py-3">Campaign Title</th>
+                                <th class="px-6 py-3">Priority</th>
+                                <th class="px-6 py-3">Strategy</th>
+                                <th class="px-6 py-3">Status</th>
+                                <th class="px-6 py-3 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-700">
+                            @forelse($priority as $item)
+                            <tr class="hover:bg-gray-700/50 transition">
+                                <td class="px-6 py-4 font-bold text-white">{{ $item->show_name }}</td>
+                                <td class="px-6 py-4">
+                                    <span class="text-red-400 font-bold flex items-center gap-1">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M18 3a1 1 0 00-1.447-.894L8.763 6H5a3 3 0 000 6h.28l1.771 5.316A1 1 0 008 18h1a1 1 0 001-1v-4.382l6.553 3.276A1 1 0 0018 15V3z"/></svg>
+                                        {{ $item->campaign_priority }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">{{ $item->recommended_strategy }}</td>
+                                <td class="px-6 py-4">
+                                    <span class="bg-green-900 text-green-300 px-2 py-1 rounded text-xs">{{ $item->status_name }}</span>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <button class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded text-xs">Launch</button>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="5" class="px-6 py-8 text-center text-gray-500">No high priority campaigns found.</td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            @if($insights->isNotEmpty())
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                @foreach($insights as $insight)
+                <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                    <h5 class="text-gray-400 text-xs uppercase font-bold">{{ $insight->genre_name }}</h5>
+                    <div class="text-2xl font-bold text-white my-2">{{ number_format($insight->avg_popularity) }} <span class="text-xs text-gray-500 font-normal">Avg Pop</span></div>
+                    <div class="text-xs text-cyan-400 mt-2">{{ $insight->targeting_recommendation }}</div>
+                </div>
+                @endforeach
+            </div>
+            @endif
+
         </div>
     </div>
 </x-app-layout>

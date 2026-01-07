@@ -30,9 +30,15 @@ Route::middleware(['auth', 'role:Marketing'])->group(function () {
         ->name('marketing.dashboard');
 });
 
-Route::middleware(['auth', 'role:Executive'])->group(function () {
-    Route::get('/executive/dashboard', [ExecutiveController::class, 'index'])
+Route::middleware(['auth'])->prefix('executive')->group(function () {
+    Route::get('/dashboard', [App\Http\Controllers\ExecutiveController::class, 'index'])
         ->name('executive.dashboard');
+
+    Route::post('/approval/{tconst}', [App\Http\Controllers\ExecutiveController::class, 'updateStatus'])
+        ->name('executive.approval');
+
+    Route::get('/review/{tconst}', [App\Http\Controllers\ExecutiveController::class, 'show'])
+        ->name('executive.show');
 });
 
 Route::middleware('auth')->group(function () {
@@ -40,5 +46,18 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+use App\Http\Controllers\CampaignController;
+
+Route::prefix('marketing')->group(function () {
+    
+    Route::get('/dashboard', [App\Http\Controllers\MarketingController::class, 'index'])->name('marketing.dashboard');
+
+    Route::resource('campaigns', CampaignController::class);
+});
+
+use App\Http\Controllers\NativeController;
+
+Route::get('/title/{tconst}', [NativeController::class, 'show'])->name('native.show');
 
 require __DIR__.'/auth.php';
